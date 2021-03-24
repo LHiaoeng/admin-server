@@ -1,6 +1,7 @@
 package com.example.cli.entity;
 
 import com.example.cli.constant.DeletedEnum;
+import com.example.cli.constant.SalesmanEnum;
 import com.example.cli.constant.StatusEnum;
 import com.example.cli.constant.TableColumn;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -9,6 +10,7 @@ import lombok.Data;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 
 /**
@@ -35,6 +37,7 @@ public class User implements Serializable {
      * 密码
      */
     @Column(name = "password")
+    @JsonIgnore
     private String password;
 
     /**
@@ -66,7 +69,7 @@ public class User implements Serializable {
 
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
     @JoinTable(name = "role_user", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
-    @JsonIgnoreProperties({"users"})
+    @JsonIgnoreProperties({"users", "menus"})
     private Role role;
 
 
@@ -95,6 +98,28 @@ public class User implements Serializable {
      */
     private DeletedEnum deleted;
 
+    /**
+     * 利润
+     */
+    @Column(name = "profit", precision = 12, scale = 2)
+    private BigDecimal profit;
+
     @Transient
     private Integer roleId;
+
+    @Transient
+    private String createUserName;
+
+    /**
+     * 业务员等级
+     */
+    @Column(name = "salesman_grade")
+    private SalesmanEnum salesmanGrade;
+
+    /**
+     * 总已付款
+     * 累计已支付的金额
+     */
+    @Column(name = "actual_price", precision = 12, scale = 2, updatable = false)
+    private BigDecimal actualPrice;
 }

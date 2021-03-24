@@ -1,8 +1,6 @@
 package com.example.cli.config;
 
 import org.apache.shiro.web.filter.authc.BasicHttpAuthenticationFilter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RequestMethod;
 
@@ -11,9 +9,10 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+/**
+ * @author wjw
+ */
 public class JWTFilter extends BasicHttpAuthenticationFilter {
-
-    private Logger LOGGER = LoggerFactory.getLogger(this.getClass());
 
     /**
      * 判断用户是否想要登入。
@@ -23,7 +22,7 @@ public class JWTFilter extends BasicHttpAuthenticationFilter {
     protected boolean isLoginAttempt(ServletRequest request, ServletResponse response) {
         HttpServletRequest req = (HttpServletRequest) request;
         String authorization = req.getHeader("Access-Token");
-        return authorization!=null;
+        return authorization != null;
     }
 
     /**

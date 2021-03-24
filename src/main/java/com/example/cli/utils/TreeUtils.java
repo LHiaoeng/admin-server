@@ -15,42 +15,43 @@ import java.util.stream.Collectors;
  */
 public class TreeUtils {
 
-    private static <T extends BaseTree> List<T> getMenuTreeList(List<T> menuList, Integer pid) {
+    public static <T extends BaseTree> List<T> getMenuTreeList(List<T> menuList, Integer pid) {
         // 查找所有菜单
         List<T> childrenList = new ArrayList<>();
         menuList.stream()
-                .filter(d ->{
-                    if(pid==null){
+                .filter(d -> {
+                    if (pid == null) {
                         return StringUtils.isEmpty(d.getParentId());
-                    }else {
+                    } else {
                         return Objects.equals(pid, d.getParentId());
                     }
-                } )
+                })
                 .collect(Collectors.toList())
                 .forEach(d -> {
-                    d.setChildren(getMenuTreeList(menuList,d.getId()));
+                    d.setChildren(getMenuTreeList(menuList, d.getId()));
                     childrenList.add(d);
                 });
         return childrenList;
     }
 
     public static <T extends BaseTree> List<T> getMenuTreeList(List<T> menuList) {
-        List<T> result=getMenuTreeList(menuList,null);
+        List<T> result = getMenuTreeList(menuList, 1);
         sortTreeList(result);
         return result;
     }
 
     /**
      * 对菜单排序
+     *
      * @param menuList
      * @param <T>
      */
     private static <T extends BaseTree> void sortTreeList(List<T> menuList) {
         menuList.sort(Comparator.comparing(T::getSort));
-        for(T t:menuList){
-             if(t.getChildren()!=null&&t.getChildren().size()!=0){
-                 sortTreeList(t.getChildren());
-             }
+        for (T t : menuList) {
+            if (t.getChildren() != null && t.getChildren().size() != 0) {
+                sortTreeList(t.getChildren());
+            }
         }
     }
 

@@ -41,4 +41,13 @@ public class MenuController {
         return new ResponseBean("success");
     }
 
+    /**
+     * 根据类型查询菜单
+     * @param type
+     * @return
+     */
+    @GetMapping("/getMenuByType")
+    public ResponseBean getMenuList(Integer type){
+        return new ResponseBean(menuService.getMenuByType(type));
+    }
 }

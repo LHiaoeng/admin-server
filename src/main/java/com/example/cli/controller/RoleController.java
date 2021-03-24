@@ -30,35 +30,35 @@ public class RoleController {
     RoleService roleService;
 
     @GetMapping
-    public ResponseBean getRolePage(RoleSearch baseSearch){
+    public ResponseBean getRolePage(RoleSearch baseSearch) {
         return new ResponseBean(roleService.getAll(baseSearch));
     }
 
     @GetMapping("/getAllPermission")
-    public ResponseBean getAllPermission(){
+    public ResponseBean getAllPermission() {
         return new ResponseBean(roleService.getAllPermission());
     }
 
 
     @GetMapping("/{id}")
-    public ResponseBean getRole(@PathVariable("id") Integer id){
+    public ResponseBean getRole(@PathVariable("id") Integer id) {
         return new ResponseBean(roleService.getRole(id));
     }
 
     @DeleteMapping
-    public ResponseBean delRole(@RequestParam("id")Integer id){
+    public ResponseBean delRole(@RequestParam("id") Integer id) {
         roleService.delRole(id);
         return new ResponseBean("success");
     }
 
     @PutMapping("/enableRole")
-    public ResponseBean enableRole(@RequestParam("id") Integer id){
+    public ResponseBean enableRole(@RequestParam("id") Integer id) {
         roleService.enableRole(id);
         return new ResponseBean("success");
     }
 
     @PutMapping("/disableRole")
-    public ResponseBean disableRole(@RequestParam("id") Integer id){
+    public ResponseBean disableRole(@RequestParam("id") Integer id) {
         roleService.disableRole(id);
         return new ResponseBean("success");
     }
@@ -70,9 +70,12 @@ public class RoleController {
     }
 
     @GetMapping("/getAll")
-    public ResponseBean getAll(){
+    public ResponseBean getAll() {
         return new ResponseBean(roleService.getAll());
     }
 
-
+    @GetMapping("/findByRoleId")
+    public ResponseBean findByRoleId(String roleId) {
+        return new ResponseBean(roleService.findByRoleId(roleId));
+    }
 }

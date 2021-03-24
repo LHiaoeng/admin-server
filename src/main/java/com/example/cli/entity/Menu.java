@@ -21,40 +21,98 @@ import lombok.*;
 @Data
 @Table(name = "menu")
 @Entity
-public class Menu extends BaseTree<Menu> implements Serializable  {
+public class Menu extends BaseTree<Menu> implements Serializable {
     private static final long serialVersionUID = 1L;
 
-
-    /***/
+    /**
+     * 菜单id
+     */
     @Id
-    @GeneratedValue(strategy=GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    /***/
+    /**
+     * 父级id
+     */
     @Column(name = "parent_id")
     private Integer parentId;
 
-    /***/
+    /**
+     * 0启用；1停用
+     */
+    @Column(name = "status", columnDefinition = "tinyint default 0")
+    private Integer status = 0;
+
+    /**
+     * VueRouter Path
+     */
     @Column(name = "path")
     private String path;
 
-    /***/
+    /**
+     * 页面标题
+     */
     @Column(name = "title")
     private String title;
 
-    /***/
+    /**
+     * 菜单图标
+     */
     @Column(name = "icon")
     private String icon;
 
-    /***/
+    /**
+     * 路由Key
+     */
     @Column(name = "permission_id")
     private String permissionId;
 
+    /**
+     * 路由名称
+     */
     @Column(name = "permission_name")
     private String permissionName;
 
-    @Column(name = "default_check")
-    private Boolean defaultCheck;
+    /**
+     * 组件名称
+     */
+    @Column(name = "component")
+    private String component;
+
+    /**
+     * 组件路径
+     */
+    @Column(name = "component_path")
+    private String componentPath;
+
+    /**
+     * 路由keepAlive
+     */
+    @Column(name = "keep_alive")
+    private Boolean keepAlive;
+
+    /**
+     * 前端： false隐藏菜单
+     */
+    @Column(name = "show_Menu")
+    private Boolean showMenu;
+
+    /**
+     * 前端：true隐藏子菜单
+     */
+    @Column(name = "hide_children")
+    private Boolean hideChildren;
+
+    /**
+     * 前端：true隐藏头部内容
+     */
+    @Column(name = "hidden_header_content")
+    private Boolean hiddenHeaderContent;
+
+    /**
+     * 前端a标签target
+     */
+    private String target;
 
     /**
      * 类型 1 菜单 2 功能
@@ -68,24 +126,12 @@ public class Menu extends BaseTree<Menu> implements Serializable  {
     @Column(name = "sort")
     private Integer sort;
 
+    @Column(name = "default_check")
+    private Boolean defaultCheck;
+
     /**
-     * 是否锁定 0 未锁定 1 锁定
+     * 前端路由重定向
      */
-    @Column(name = "is_lock")
-    private Integer lock;
-
-    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
-    @JoinColumn(name = "route_id")
-    @JsonIgnoreProperties({"menu"})
-    private Route route;
-
-
-    @OneToMany(mappedBy = "menu",fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
-    @JsonIgnore
-    private Set<Interface> interfaces;
-
-    @ManyToMany(mappedBy = "menus")
-    @JsonIgnore
-    private Set<Role> roles;
-
+    @Column(name = "redirect")
+    private String redirect;
 }

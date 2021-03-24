@@ -1,44 +1,53 @@
 package com.example.cli.service;
 
 
+import com.example.cli.constant.CommonConstant;
 import com.example.cli.constant.DeletedEnum;
 import com.example.cli.constant.StatusEnum;
 import com.example.cli.domain.add.AddUserRole;
 import com.example.cli.domain.common.ActionEntrySet;
 import com.example.cli.domain.common.PageInfo;
 import com.example.cli.domain.common.Permission;
+import com.example.cli.domain.common.RouterMenu;
 import com.example.cli.domain.search.UserSearch;
 import com.example.cli.entity.Menu;
 import com.example.cli.entity.Role;
-import com.example.cli.entity.Route;
 import com.example.cli.entity.User;
+import com.example.cli.exception.BaseException;
 import com.example.cli.repository.RoleRepository;
 import com.example.cli.repository.UserRepository;
 import com.example.cli.utils.*;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import javax.persistence.criteria.Predicate;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.math.BigDecimal;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
  * @author wjw
  */
 @Service
+@Slf4j
 public class UserService {
 
     @Autowired
     private UserRepository userRepository;
     @Autowired
     private RoleRepository roleRepository;
+
+    /**
+     * 默认密码
+     */
+    private final static String DEFAULT_PASSWORDS = "wjw123456";
 
     public PageInfo<User> getAll(UserSearch baseSearch) {
         Pageable pageable = PageRequest.of(baseSearch.getPageNo() - 1, baseSearch.getPageSize());
@@ -62,8 +71,19 @@ public class UserService {
             predicates.add(criteriaBuilder.equal(root.get("deleted"), DeletedEnum.NOT_DELETE));
             return query.where(predicates.toArray(new Predicate[predicates.size()])).getRestriction();
         };
-        return PageUtils.getPageInfo(userRepository.findAll(specification, pageable), User.class);
 
+        Page<User> userPage = userRepository.findAll(specification, pageable);
+
+        for (User user : userPage.getContent()) {
+            if (null != user.getRole()) {
+                user.setRoleId(user.getRole().getId());
+            }
+            if (null != user.getCreateUser()) {
+                user.setCreateUserName(user.getCreateUser().getName());
+            }
+        }
+
+        return PageUtils.getPageInfo(userPage, User.class);
     }
 
     public User getInfo() {
@@ -108,8 +128,8 @@ public class UserService {
 
     }
 
-
-    public List<Route> getCurrentUserNav() {
+    @Modifying(clearAutomatically = true)
+    public List<RouterMenu> getCurrentUserNav() {
         User user = RequestUserHolder.getUser();
         Role role = user.getRole();
         if (role == null) {
@@ -117,10 +137,16 @@ public class UserService {
         }
 
         List<Menu> menus = role.getMenus();
-        //只要菜单的route
-        return menus.stream().filter(menu -> menu.getType().equals(1))
-                .map(Menu::getRoute)
+
+        //筛选菜单
+        List<RouterMenu> routerMenus = menus.stream().filter(menu -> menu.getType().equals(1) && !menu.getId().equals(1))
+                .map(menu -> {
+                    RouterMenu routerMenu = new RouterMenu(menu);
+                    return routerMenu;
+                })
                 .collect(Collectors.toList());
+        Collections.sort(routerMenus, Comparator.comparing(RouterMenu::getSort));
+        return routerMenus;
     }
 
 
@@ -130,15 +156,25 @@ public class UserService {
 
     public void saveUser(User user) {
         User useUser = RequestUserHolder.getUser();
-        if (!StringUtils.isEmpty(user.getRoleId())) {
-            Role role = roleRepository.getOne(user.getRoleId());
-            user.setRole(role);
+        Role role = new Role();
+
+        if (null != user.getRoleId()) {
+           role = roleRepository.getOne(user.getRoleId());
         }
+
+        user.setRole(role);
+
         if (StringUtils.isEmpty(user.getId())) {
-            user.setPassword(MD5Utils.stringToMD5(user.getPassword()));
+            if (StringUtils.isEmpty(user.getPassword())) {
+                user.setPassword(MD5Utils.stringToMD5(DEFAULT_PASSWORDS));
+            } else {
+                user.setPassword(MD5Utils.stringToMD5(user.getPassword()));
+            }
+
             user.setCreateTime(new Date());
             user.setCreateUser(useUser);
             user.setDeleted(DeletedEnum.NOT_DELETE);
+            user.setStatus(StatusEnum.USED);
             userRepository.saveAndFlush(user);
         } else {
             User old = userRepository.getOne(user.getId());
@@ -188,5 +224,40 @@ public class UserService {
         return actionEntrySets;
     }
 
+    /**
+     * 查询手机号码是否绑定用户
+     *
+     * @param phone
+     * @return
+     */
+    public Integer findPhoneNum(String phone) {
+        return userRepository.findPhoneNum(phone);
+    }
 
+    /**
+     * 查询账号是否存在
+     *
+     * @param name
+     * @return
+     */
+    public Integer findNameNum(String name) {
+        return userRepository.findNameNum(name);
+    }
+
+    /**
+     * 为业务员充值
+     * @param rechage
+     * @param user
+     */
+    void updateActualPrice(BigDecimal rechage, User user) {
+        User useUser = RequestUserHolder.getUser();
+
+        int ret = userRepository.updateActualPrice(rechage, user.getId());
+        if (ret <= 0) {
+            throw new BaseException(CommonConstant.EXCEPTION, "充值失败");
+        }
+
+        log.info("{}，{}（{}）为账号{}（{}）充值：{}", DateUtils.getNowDate(),
+                useUser.getName(), useUser.getId(), user.getName(), user.getId(), rechage.toString());
+    }
 }

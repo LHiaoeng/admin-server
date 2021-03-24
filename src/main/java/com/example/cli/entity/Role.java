@@ -30,13 +30,13 @@ public class Role implements Serializable {
 
     /***/
     @Id
-    @GeneratedValue(strategy=GenerationType.IDENTITY)
-    @TableColumn(title = "唯一识别码",sort = 1)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @TableColumn(title = "唯一识别码", sort = 1)
     private Integer id;
 
     /***/
     @Column(name = "name")
-    @TableColumn(title = "角色名称",sort = 2)
+    @TableColumn(title = "角色名称", sort = 2)
     private String name;
 
     /***/
@@ -48,23 +48,22 @@ public class Role implements Serializable {
     private String describe;
 
 
-    @OneToOne(fetch = FetchType.EAGER,cascade = CascadeType.MERGE)
+    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
     @JoinColumn(name = "create_id")
     @JsonIgnore
     private User createUser;
 
     @Column(name = "create_time")
-    @TableColumn(title = "创建时间",scopeSlots = "createTime",sort = 4)
+    @TableColumn(title = "创建时间", scopeSlots = "createTime", sort = 4)
     private Date createTime;
 
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
-    @JoinTable(name = "menu_role",joinColumns = @JoinColumn(name="role_id",referencedColumnName = "id"),inverseJoinColumns = @JoinColumn(name = "function_id",referencedColumnName = "id"))
-    @JsonIgnore
+    @JoinTable(name = "menu_role", joinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "function_id", referencedColumnName = "id"))
     private List<Menu> menus;
 
 
-    @OneToMany(mappedBy = "role",fetch = FetchType.EAGER,cascade = CascadeType.MERGE)
+    @OneToMany(mappedBy = "role", fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
     @JsonIgnore
     private List<User> users;
 
@@ -72,7 +71,7 @@ public class Role implements Serializable {
      * 0 使用 1禁用
      */
     @Enumerated(EnumType.ORDINAL)
-    @TableColumn(title = "状态",sort = 3)
+    @TableColumn(title = "状态", sort = 3)
     private StatusEnum status;
 
     /**
@@ -82,8 +81,8 @@ public class Role implements Serializable {
     private DeletedEnum deleted;
 
     @Transient
-    private List<Permission>  permissions;
+    private List<Permission> permissions;
 
     @Transient
-    private List<List<Integer>> permissionIds;
+    private List<Integer> permissionIds;
 }

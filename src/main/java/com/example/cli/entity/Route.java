@@ -21,8 +21,6 @@ import lombok.*;
 public class Route extends BaseTree<Route> implements Serializable {
     private static final long serialVersionUID = 1L;
 
-
-    /***/
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Integer id;
@@ -68,9 +66,5 @@ public class Route extends BaseTree<Route> implements Serializable {
     /***/
     @Column(name = "is_lock")
     private Integer lock;
-
-    @OneToOne(mappedBy = "route",fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
-    private Menu menu;
-
 
 }

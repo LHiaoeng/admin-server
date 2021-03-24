@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Date;
+
 @Component
 public class JWTUtil {
 
@@ -19,8 +20,10 @@ public class JWTUtil {
     private int expireTime;
     @Value("${auth.secret}")
     private String secret;
+
     /**
      * 校验token是否正确
+     *
      * @return 是否正确
      */
     public AuthEnum verify(String token) {
@@ -30,7 +33,7 @@ public class JWTUtil {
                     .build();
             verifier.verify(token);
             return AuthEnum.SUCCESS;
-        } catch (ExpiredJwtException e){
+        } catch (ExpiredJwtException e) {
             return AuthEnum.EXPIRE;
         } catch (Exception exception) {
             return AuthEnum.FAILED;
@@ -39,9 +42,10 @@ public class JWTUtil {
 
     /**
      * 获得token中的信息无需secret解密也能获得
+     *
      * @return token中包含的用户名
      */
-    public  String getUsername(String token) {
+    public String getUsername(String token) {
         try {
             DecodedJWT jwt = JWT.decode(token);
             return jwt.getClaim("username").asString();
@@ -50,7 +54,7 @@ public class JWTUtil {
         }
     }
 
-    public  Integer getUserId(String token) {
+    public Integer getUserId(String token) {
         try {
             DecodedJWT jwt = JWT.decode(token);
             return jwt.getClaim("id").asInt();
@@ -58,7 +62,8 @@ public class JWTUtil {
             return null;
         }
     }
-    public  Integer getUserType(String token) {
+
+    public Integer getUserType(String token) {
         try {
             DecodedJWT jwt = JWT.decode(token);
             return jwt.getClaim("type").asInt();
@@ -67,7 +72,7 @@ public class JWTUtil {
         }
     }
 
-    public  String getUserKey(String token,String key) {
+    public String getUserKey(String token, String key) {
         try {
             DecodedJWT jwt = JWT.decode(token);
             return jwt.getClaim(key).asString();
@@ -75,18 +80,20 @@ public class JWTUtil {
             return null;
         }
     }
+
     /**
      * 生成签名
+     *
      * @param username 用户名
      * @return 加密的token
      */
-    public  String sign(Integer id,String username) {
+    public String sign(Integer id, String username) {
         try {
-            Date date = new Date(System.currentTimeMillis()+expireTime);
+            Date date = new Date(System.currentTimeMillis() + expireTime);
             Algorithm algorithm = Algorithm.HMAC256(secret);
             // 附带username信息
             return JWT.create()
-                    .withClaim("id",id)
+                    .withClaim("id", id)
                     .withClaim("username", username)
                     .withExpiresAt(date)
                     .sign(algorithm);

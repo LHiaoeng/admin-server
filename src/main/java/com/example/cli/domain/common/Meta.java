@@ -1,13 +1,10 @@
 package com.example.cli.domain.common;
 
+import com.example.cli.entity.Menu;
 import lombok.Data;
 
 /**
- * @author liwei
- * @title: Meta
- * @projectName cli
- * @description: TODO
- * @date 2019-10-21 15:55
+ * @author wjw
  */
 @Data
 public class Meta {
@@ -15,4 +12,22 @@ public class Meta {
 
     private Boolean cache;
 
+    private Boolean show;
+
+    private Boolean hiddenHeaderContent;
+
+    private String target;
+
+    private String icon;
+
+    private Boolean keepAlive;
+
+    public Meta(Menu menu) {
+        this.title = menu.getTitle();
+        this.show = menu.getShowMenu();
+        this.hiddenHeaderContent = menu.getHiddenHeaderContent();
+        this.target = menu.getTarget();
+        this.icon = menu.getIcon();
+        this.keepAlive = menu.getKeepAlive();
+    }
 }

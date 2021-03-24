@@ -22,4 +22,6 @@ import java.util.List;
 public interface RoleRepository extends JpaRepository<Role,Integer>, JpaSpecificationExecutor<Role> {
 
     List<Role> findAllByDeletedAndStatus(DeletedEnum deletedEnum, StatusEnum statusEnum);
+
+    List<Role> findByRoleId(String roleId);
 }
