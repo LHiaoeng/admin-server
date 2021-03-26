@@ -14,4 +14,5 @@ public class GoodsSearch extends BaseSearch {
     private String goodsType;
     private String goodsCode;
     private Integer status;
+    private Boolean isStock;
 }

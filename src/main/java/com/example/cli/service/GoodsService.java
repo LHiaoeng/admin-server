@@ -72,6 +72,14 @@ public class GoodsService {
                 predicates.add(criteriaBuilder.like(root.get("userName"), "%" + baseSearch.getGoodsType() + "%"));
             }
 
+            if (null != baseSearch.getIsStock()) {
+                if (baseSearch.getIsStock()) {
+                    predicates.add(criteriaBuilder.gt(root.get("stock"), 0));
+                } else {
+                    predicates.add(criteriaBuilder.equal(root.get("stock"), 0));
+                }
+            }
+
             return query.where(predicates.toArray(new Predicate[predicates.size()])).getRestriction();
         };
 
